@@ -1,0 +1,36 @@
+name: Build and Publish Singularity Image
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'    # Por ejemplo, cuando hagas un release o tag con formato v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install Singularity
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y squashfs-tools wget
+          export SINGULARITY_VERSION="3.11.7"
+          wget https://github.com/hpcng/singularity/releases/download/v${SINGULARITY_VERSION}/singularity-ce_${SINGULARITY_VERSION}_amd64.deb
+          sudo dpkg -i singularity-ce_${SINGULARITY_VERSION}_amd64.deb
+
+      - name: Build SIF
+        run: |
+          singularity build omicverse_custom.sif Singularity.def
+
+      - name: Minimal Test
+        run: |
+          # Ejemplo sencillo: verificar importación de torch
+          singularity exec omicverse_custom.sif python -c "import torch; print(torch.__version__)"
+          # Añade otros tests si lo requieres
+      - name: End
+        run: | 
+          echo Test run successully!
