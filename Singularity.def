@@ -2,8 +2,8 @@ Bootstrap: docker
 From: starlitnightly/omicverse:py310_cpu_latest
 
 %labels
-    MAINTAINER "Tu Nombre <tu.correo@dominio.com>"
-    VERSION "1.0"
+    MAINTAINER "Ignacio Garzón Álvarez igarzonalva@alumni.unav.es"
+    VERSION "PLACEHOLDER_VERSION" 
 
 %post
     echo "Instalando paquetes Python locales..."
