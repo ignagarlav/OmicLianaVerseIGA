@@ -39,8 +39,8 @@ jobs:
       - name: Minimal Test
         run: |
           # Ejemplo sencillo: verificar importación de torch
-          singularity exec omicverse_custom.sif python -c "import torch; print(torch.__version__)"
-          singularity exec omicverse_custom.sif python -c "import omicverse; print(omicverse.__version__)"
+          sudo -E /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity exec omicverse_custom.sif python -c "import torch; print(torch.__version__)"
+          sudo -E /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity exec omicverse_custom.sif python -c "import omicverse; print(omicverse.__version__)"
       - name: End
         run: | 
           echo Test run successully!
