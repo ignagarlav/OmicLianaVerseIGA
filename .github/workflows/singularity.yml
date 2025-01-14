@@ -19,7 +19,19 @@ jobs:
         uses: eWaterCycle/setup-singularity@v7
         with:
           singularity-version: 3.8.3
-          
+      
+      - name: Extract version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          # remove 'refs/tags/' prefix and store as VERSION
+          echo "VERSION=${GITHUB_REF_NAME#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Inject version into .def
+        run: |
+          # Suppose your .def file has a line: VERSION "1.0"
+          # We'll replace it with the real version from $VERSION
+          sed -i "s/VERSION \"1.0\"/VERSION \"${VERSION}\"/g" Singularity.def
+      
       - name: Build SIF
         run: |
           singularity build omicverse_custom.sif Singularity.def
