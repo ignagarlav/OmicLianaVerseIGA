@@ -1,0 +1,48 @@
+name: Build and Publish Singularity Image
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'    # Por ejemplo, cuando hagas un release o tag con formato v1.0.0
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Install Singularity
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y squashfs-tools wget
+          export SINGULARITY_VERSION="3.11.7"
+          wget https://github.com/hpcng/singularity/releases/download/v${SINGULARITY_VERSION}/singularity-ce_${SINGULARITY_VERSION}_amd64.deb
+          sudo dpkg -i singularity-ce_${SINGULARITY_VERSION}_amd64.deb
+
+      - name: Build SIF
+        run: |
+          singularity build omicverse_custom.sif Singularity.def
+
+      - name: Minimal Test
+        run: |
+          # Ejemplo sencillo: verificar importación de torch
+          singularity exec omicverse_custom.sif python -c "import omicverse; print(omicverse.__version__)"
+          singularity exec omicverse_custom.sif python -c "import liana; print(liana.__version__)"
+          # Añade otros tests si lo requieres
+
+      - name: Package SIF in Docker Image
+        run: |
+          # Creamos un Dockerfile que copie el SIF en /omicverse
+          echo "FROM alpine:latest" > Dockerfile
+          echo "COPY omicverse_custom.sif /omicverse_custom.sif" >> Dockerfile
+
+          # Construimos la imagen Docker localmente
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/omicverse_custom_sif:${{ github.ref_name }} .
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/omicverse_custom_sif:${{ github.ref_name }} .
