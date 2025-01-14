@@ -34,7 +34,7 @@ jobs:
       
       - name: Build SIF
         run: |
-          singularity build omicverse_custom.sif Singularity.def
+          sudo -E singularity build omicverse_custom.sif Singularity.def
 
       - name: Minimal Test
         run: |
