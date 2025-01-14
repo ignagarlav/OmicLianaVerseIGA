@@ -30,7 +30,7 @@ jobs:
         run: |
           # Suppose your .def file has a line: VERSION "1.0"
           # We'll replace it with the real version from $VERSION
-          sed -i "s/VERSION \"1.0\"/VERSION \"${VERSION}\"/g" Singularity.def
+           sed -i "s/PLACEHOLDER_VERSION/${VERSION}/g" Singularity.def
       
       - name: Build SIF
         run: |
