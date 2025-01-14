@@ -43,7 +43,7 @@ jobs:
       - name: Push 
         run: |
           echo ${{ secrets.GHCR_PAT }} | /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity remote login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
-          /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity push omicverse_custom.sif oras://ghcr.io/${GHCR_USERNAME}:latest
+          /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity push omicverse_custom.sif oras://ghcr.io/${GHCR_USERNAME}/omicverse_custom:latest
       - name: End
         run: | 
           echo finished!
