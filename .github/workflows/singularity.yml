@@ -6,6 +6,10 @@ on:
       - 'v*.*.*'    # Por ejemplo, cuando hagas un release o tag con formato v1.0.0
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+  
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -36,11 +40,10 @@ jobs:
         run: |
           sudo -E /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity build omicverse_custom.sif Singularity.def
 
-      - name: Minimal Test
+      - name: Push 
         run: |
-          # Ejemplo sencillo: verificar importación de torch
-          sudo -E /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity exec omicverse_custom.sif python -c "import torch; print(torch.__version__)"
-          sudo -E /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity exec omicverse_custom.sif python -c "import omicverse; print(omicverse.__version__)"
+          echo ${{ secrets.GHCR_PAT }} | /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity remote login -u ${{ secrets.GHCR_USERNAME }} --password-stdin oras://ghcr.io
+          /opt/hostedtoolcache/singularity/3.8.3/x64/bin/singularity push omicverse_custom.sif oras://ghcr.io/${GHCR_USERNAME}:latest
       - name: End
         run: | 
-          echo Test run successully!
+          echo finished!
